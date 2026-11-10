@@ -5,11 +5,25 @@ Usage:
     python main.py
 """
 
+import pygame
+
 from game import Game
 from sonify import Sonifier
 
-# Create a game
+def main() -> None:
+    """The entry point. Launches the game, GUI, and starts sonifying."""
 
-# Launch sonification
+    pygame.init()
+    screen: pygame.Surface = pygame.display.set_mode((1280, 720))
+    clock: pygame.Clock = pygame.time.Clock()
+    running: bool = True
 
-# Game mainloop...
+    # Create a game
+
+    # Launch sonification
+
+    # Game mainloop...
+    pass
+
+if __name__ == "__main__":
+    main()
