@@ -29,13 +29,19 @@ Chess. (onification)
   * Instrument changes w/ position
 * Each piece as own instrument
   * Pawns = drum set? + timpani or something?
-  * Rooks = bass
-  * Bishops = flute
-  * Knight = violin? (not those horrible violas)
+  * Rooks = bass/trumpet/brass?
+  * Bishops = flute/basson
+  * Knight = violin? cello (not those horrible violas)
   * Queen = vocal (operatic?) / Hammond organ?
   * King = triangle?? (that's percussion but uh sure)
+  maybe modulation/key?
+* What dictates pitches?
+  * Maybe we take from music mouse and use the row and column pos to determine pitch? would we want pieces to play 2 pitches or one pitch?
+  * incorperate the tile that the piece is coming from as well
+  * row is o, column is pitch name?
 * Sonifying other events
   * Attacks/tactics
+  (perhaps when a capture event happens a four bar battle sequence happens)
   * Promotion
   * Castling
   * Check, stale/checkmate
@@ -44,6 +50,7 @@ Chess. (onification)
   * In terms of "whose" instruments are being played?
   * Differences between White + Black instruments, stylistically
     * e.g., upright vs. electric bass
+  * Eval bar??? (dominance determined by who is winning at the time)
 * What are the file formats for chess games?
   * PGN
   * Loading in games
