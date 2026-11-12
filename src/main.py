@@ -5,9 +5,9 @@ Usage:
     python main.py
 """
 
+import chess
 import pygame
 
-from game import Game
 from sonify import Sonifier
 
 class App:
