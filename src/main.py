@@ -9,7 +9,7 @@ import chess
 import pygame
 
 from sonify import Sonifier
-from ui import *
+from constants import *
 
 class App:
     """
