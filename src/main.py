@@ -9,6 +9,7 @@ import chess
 import pygame
 
 from sonify import Sonifier
+from ui import *
 
 class App:
     """
@@ -23,6 +24,8 @@ class App:
         self.screen: pygame.Surface = pygame.display.set_mode((1280, 720))
         self.clock: pygame.Clock = pygame.time.Clock()
 
+        self.board = chess.Board()
+
     def mainloop(self) -> App:
         """
         Run the app. Blocks until the app is quit (e.g., by clicking the "X"
@@ -35,14 +38,29 @@ class App:
                 if event.type == pygame.QUIT:
                     running = False
     
-            self.screen.fill("purple")
-    
-            # TODO: render game
+            self.render()
     
             pygame.display.flip()
             self.clock.tick(60)
 
         return self
+
+    def render(self) -> None:
+        """Draw a new frame containing the background and board state."""
+
+        self.screen.fill(COLOR_BACKGROUND)
+
+        # Draw squares
+        for row in range(8):
+            for col in range(8):
+                if (row + col) % 2 == 0:
+                    self.screen.blit(SURFACE_LIGHT_SQUARE, (row * 50, col * 50))
+                else:
+                    self.screen.blit(SURFACE_DARK_SQUARE, (row * 50, col * 50))
+
+        # Draw pieces
+        for square, piece in self.board.piece_map().items():
+            pass
 
     def close(self) -> None:
         """Frees resources held by this app instance."""
