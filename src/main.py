@@ -17,7 +17,7 @@ class App:
     etc.).
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Create a new app instance."""
         pygame.init()
 
@@ -25,6 +25,7 @@ class App:
         self.clock: pygame.Clock = pygame.time.Clock()
 
         self.board = chess.Board()
+        self.cursor = self.Cursor(self)
 
     def mainloop(self) -> App:
         """
@@ -49,32 +50,50 @@ class App:
             if event.type == pygame.QUIT:
                 self.running = False
 
+    def _pointOfCoords(self, row: int, col: int) -> tuple[float, float]:
+        return (self.screen.width // 2 + (col - 4) * SQUARE_LENGTH,
+                self.screen.height // 2 + (row - 4) * SQUARE_LENGTH)
+
     def render(self) -> None:
         """Draw a new frame containing the background and board state."""
 
-        def pointOfCoords(row: int, col: int) -> tuple[float, float]:
-            return (self.screen.width // 2 + (col - 4) * SQUARE_LENGTH,
-                    self.screen.height // 2 + (row - 4) * SQUARE_LENGTH)
-
         def drawSquare(row: int, col: int) -> None:
             if (row + col) % 2 == 0:
-                self.screen.blit(SURFACE_LIGHT_SQUARE, pointOfCoords(row, col))
+                self.screen.blit(SURFACE_LIGHT_SQUARE, self._pointOfCoords(row, col))
             else:
-                self.screen.blit(SURFACE_DARK_SQUARE, pointOfCoords(row, col))
+                self.screen.blit(SURFACE_DARK_SQUARE, self._pointOfCoords(row, col))
 
         def drawPiece(piece: str, row: int, col: int) -> None:
-            self.screen.blit(DICT_PIECES[piece], pointOfCoords(row, col))
+            self.screen.blit(DICT_PIECES[piece], self._pointOfCoords(row, col))
 
         self.screen.fill(COLOR_BACKGROUND)
         [drawSquare(r, c) for r in range(8) for c in range(8)]
         [drawPiece(piece.symbol(),
                    7 - chess.square_rank(square), chess.square_file(square))
          for square, piece in self.board.piece_map().items()]
+        self.cursor.drawSelf()
 
     def close(self) -> None:
         """Frees resources held by this app instance."""
 
         pygame.quit()
+
+    class Cursor:
+        def __init__(self, appInstance: App) -> None:
+            self.row = 0
+            self.col = 0
+            self.appInstance = appInstance
+
+        def drawSelf(self) -> None:
+            nwX, nwY = self.appInstance._pointOfCoords(self.row, self.col)
+            nwX, nwY = nwX - CURSOR_OUTSET, nwY - CURSOR_OUTSET
+            otherSide = SQUARE_LENGTH - CURSOR_SIZE + 2 * CURSOR_OUTSET
+
+            screen = self.appInstance.screen
+            screen.blit(SURFACE_CURSOR_NW, (nwX,             nwY))
+            screen.blit(SURFACE_CURSOR_NE, (nwX + otherSide, nwY))
+            screen.blit(SURFACE_CURSOR_SE, (nwX + otherSide, nwY + otherSide))
+            screen.blit(SURFACE_CURSOR_SW, (nwX,             nwY + otherSide))
 
 
 def main() -> None:
