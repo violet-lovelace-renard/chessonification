@@ -2,7 +2,7 @@ import pygame
 
 COLOR_BACKGROUND = pygame.Color.from_hex("#323232")
 COLOR_LIGHT_SQUARE = pygame.Color.from_hex("#b97bfc")
-COLOR_DARK_SQUARE = pygame.Color.from_hex("#5d17a8")
+COLOR_DARK_SQUARE = pygame.Color.from_hex("#8128e0")
 
 SQUARE_LENGTH = 96
 
