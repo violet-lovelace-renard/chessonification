@@ -32,23 +32,25 @@ class App:
         close window button). Returns `self` for method chaining.
         """
 
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-    
+        self.running = True
+        while self.running:
             self.render()
+            self.handleEvents()
     
             pygame.display.flip()
             self.clock.tick(60)
 
         return self
 
+    def handleEvents(self) -> None:
+        """Handle controls and OS-level app interactions."""
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+
     def render(self) -> None:
         """Draw a new frame containing the background and board state."""
-
-        self.screen.fill(COLOR_BACKGROUND)
 
         def pointOfCoords(row: int, col: int) -> tuple[float, float]:
             return (self.screen.width // 2 + (col - 4) * SQUARE_LENGTH,
@@ -63,14 +65,11 @@ class App:
         def drawPiece(piece: str, row: int, col: int) -> None:
             self.screen.blit(DICT_PIECES[piece], pointOfCoords(row, col))
 
-        # Draw squares
+        self.screen.fill(COLOR_BACKGROUND)
         [drawSquare(r, c) for r in range(8) for c in range(8)]
-
-        # Draw pieces
         [drawPiece(piece.symbol(),
                    7 - chess.square_rank(square), chess.square_file(square))
          for square, piece in self.board.piece_map().items()]
-            
 
     def close(self) -> None:
         """Frees resources held by this app instance."""
