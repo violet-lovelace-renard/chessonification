@@ -50,22 +50,27 @@ class App:
 
         self.screen.fill(COLOR_BACKGROUND)
 
-        def drawSquare(row, col) -> None:
+        def pointOfCoords(row: int, col: int) -> tuple[float, float]:
+            return (self.screen.width // 2 + (col - 4) * SQUARE_LENGTH,
+                    self.screen.height // 2 + (row - 4) * SQUARE_LENGTH)
+
+        def drawSquare(row: int, col: int) -> None:
             if (row + col) % 2 == 0:
-                self.screen.blit(SURFACE_LIGHT_SQUARE,
-                                 (self.screen.width // 2 + (col - 4) * SQUARE_LENGTH,
-                                  self.screen.height // 2 + (row - 4) * SQUARE_LENGTH))
+                self.screen.blit(SURFACE_LIGHT_SQUARE, pointOfCoords(row, col))
             else:
-                self.screen.blit(SURFACE_DARK_SQUARE,
-                                 (self.screen.width // 2 + (col - 4) * SQUARE_LENGTH,
-                                  self.screen.height // 2 + (row - 4) * SQUARE_LENGTH))
+                self.screen.blit(SURFACE_DARK_SQUARE, pointOfCoords(row, col))
+
+        def drawPiece(piece: str, row: int, col: int) -> None:
+            self.screen.blit(DICT_PIECES[piece], pointOfCoords(row, col))
 
         # Draw squares
         [drawSquare(r, c) for r in range(8) for c in range(8)]
 
         # Draw pieces
-        for square, piece in self.board.piece_map().items():
-            pass
+        [drawPiece(piece.symbol(),
+                   7 - chess.square_rank(square), chess.square_file(square))
+         for square, piece in self.board.piece_map().items()]
+            
 
     def close(self) -> None:
         """Frees resources held by this app instance."""
