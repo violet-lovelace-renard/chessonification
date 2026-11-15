@@ -21,7 +21,7 @@ class App:
         """Create a new app instance."""
         pygame.init()
 
-        self.screen: pygame.Surface = pygame.display.set_mode((1280, 720))
+        self.screen: pygame.Surface = pygame.display.set_mode(flags=pygame.FULLSCREEN)
         self.clock: pygame.Clock = pygame.time.Clock()
 
         self.board = chess.Board()
@@ -50,13 +50,18 @@ class App:
 
         self.screen.fill(COLOR_BACKGROUND)
 
+        def drawSquare(row, col) -> None:
+            if (row + col) % 2 == 0:
+                self.screen.blit(SURFACE_LIGHT_SQUARE,
+                                 (self.screen.width // 2 + (col - 4) * SQUARE_LENGTH,
+                                  self.screen.height // 2 + (row - 4) * SQUARE_LENGTH))
+            else:
+                self.screen.blit(SURFACE_DARK_SQUARE,
+                                 (self.screen.width // 2 + (col - 4) * SQUARE_LENGTH,
+                                  self.screen.height // 2 + (row - 4) * SQUARE_LENGTH))
+
         # Draw squares
-        for row in range(8):
-            for col in range(8):
-                if (row + col) % 2 == 0:
-                    self.screen.blit(SURFACE_LIGHT_SQUARE, (row * 50, col * 50))
-                else:
-                    self.screen.blit(SURFACE_DARK_SQUARE, (row * 50, col * 50))
+        [drawSquare(r, c) for r in range(8) for c in range(8)]
 
         # Draw pieces
         for square, piece in self.board.piece_map().items():
