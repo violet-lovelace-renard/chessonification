@@ -53,8 +53,8 @@ class App:
         """Draw a new frame containing the background and board state."""
 
         def pointOfCoords(row: int, col: int) -> tuple[float, float]:
-            return (self.screen.width // 2 + (col - 4) * SQUARE_LENGTH,
-                    self.screen.height // 2 + (row - 4) * SQUARE_LENGTH)
+            return (self.screen.width // 2 + (col - 4) * SQUARE_SIZE,
+                    self.screen.height // 2 + (row - 4) * SQUARE_SIZE)
 
         def drawSquare(row: int, col: int) -> None:
             if (row + col) % 2 == 0:
