@@ -34,10 +34,14 @@ class App:
             pygame.K_s: self.cursor.moveDown,
             pygame.K_a: self.cursor.moveLeft,
             pygame.K_d: self.cursor.moveRight,
+            pygame.K_o: self.handleConfirm,
+            pygame.K_p: self.handleCancel
         }
         self.holdableKeys = [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]
         self.keyHeldTicks: int | None = None
         self.keyHeld: int | None = None
+
+        self.inMenu = False
 
     def mainloop(self) -> App:
         """
@@ -86,9 +90,30 @@ class App:
             if ticks > 0 and ticks % KEY_REPEAT_PERIOD == 0:
                 self.keyMap[self.keyHeld]()
 
+    def handleConfirm(self) -> None:
+        """
+        Handle 'O' button press, which usually means to initiate or confirm
+        some action.
+        """
+
+        if self.inMenu:
+            self.inMenu = False
+
+        else:
+            self.inMenu = True
+
+    def handleCancel(self) -> None:
+        """
+        Handle 'P' button press, which usually means to cancel the currently
+        selected action.
+        """
+
+        if self.inMenu:
+            self.inMenu = False
+
     def _pointOfCoords(self, row: int, col: int) -> tuple[float, float]:
-        return (self.screen.width // 2 + (col - 4) * SQUARE_LENGTH,
-                self.screen.height // 2 + (row - 4) * SQUARE_LENGTH)
+        return (self.screen.width // 2 + (col - 4) * SQUARE_SIZE,
+                self.screen.height // 2 + (row - 4) * SQUARE_SIZE)
 
     def render(self) -> None:
         """Draw a new frame containing the background and board state."""
@@ -107,7 +132,11 @@ class App:
         [drawPiece(piece.symbol(),
                    7 - chess.square_rank(square), chess.square_file(square))
          for square, piece in self.board.piece_map().items()]
-        self.cursor.drawSelf()
+
+        if self.inMenu:
+            self.cursor.drawMenuCursor()
+        else:
+            self.cursor.drawCursor()
 
     def close(self) -> None:
         """Frees resources held by this app instance."""
@@ -116,36 +145,54 @@ class App:
 
     class Cursor:
         def __init__(self, appInstance: App) -> None:
+            self.appInstance = appInstance
+            self.menuIndex = 0
+
             self.row = 0
             self.col = 0
-            self.appInstance = appInstance
 
         def moveUp(self) -> None:
-            if self.row > 0:
-                self.row -= 1
+            if self.appInstance.inMenu:
+                self.menuIndex = (self.menuIndex + 1) % MENU_OPTIONS
+            else:
+                if self.row > 0:
+                    self.row -= 1
 
         def moveDown(self) -> None:
-            if self.row < 8 - 1:
-                self.row += 1
+            if self.appInstance.inMenu:
+                self.menuIndex = (self.menuIndex - 1) % MENU_OPTIONS
+            else:
+                if self.row < 8 - 1:
+                    self.row += 1
 
         def moveLeft(self) -> None:
-            if self.col > 0:
+            if not self.appInstance.inMenu and self.col > 0:
                 self.col -= 1
 
         def moveRight(self) -> None:
-            if self.col < 8 - 1:
+            if not self.appInstance.inMenu and self.col < 8 - 1:
                 self.col += 1
 
-        def drawSelf(self) -> None:
+        def drawCursor(self) -> None:
+            """Draw cursor to the chessboard (menu off)."""
+
             nwX, nwY = self.appInstance._pointOfCoords(self.row, self.col)
             nwX, nwY = nwX - CURSOR_OUTSET, nwY - CURSOR_OUTSET
-            otherSide = SQUARE_LENGTH - CURSOR_SIZE + 2 * CURSOR_OUTSET
+            otherSide = SQUARE_SIZE - CURSOR_SIZE + 2 * CURSOR_OUTSET
 
             screen = self.appInstance.screen
             screen.blit(SURFACE_CURSOR_NW, (nwX,             nwY))
             screen.blit(SURFACE_CURSOR_NE, (nwX + otherSide, nwY))
             screen.blit(SURFACE_CURSOR_SE, (nwX + otherSide, nwY + otherSide))
             screen.blit(SURFACE_CURSOR_SW, (nwX,             nwY + otherSide))
+
+        def drawMenuCursor(self) -> None:
+            """Draw selector to the screen (menu on)."""
+
+            point = self.appInstance._pointOfCoords(self.row, self.col)
+            adjusted = [point[0] + SQUARE_SIZE - SELECTOR_SIZE,
+                        point[1] + SQUARE_SIZE / 2 - SELECTOR_SIZE]
+            self.appInstance.screen.blit(SURFACE_SELECTOR, adjusted)
 
 
 def main() -> None:

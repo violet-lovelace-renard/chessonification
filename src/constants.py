@@ -7,30 +7,30 @@ COLOR_CURSOR_BODY = pygame.Color.from_hex("#eeeeee")
 COLOR_CURSOR_OUTLINE = pygame.Color.from_hex("#111111")
 COLOR_NONE = pygame.Color.from_hex("#00000000")
 
-SQUARE_LENGTH = 96
+SQUARE_SIZE = 96
 
-SURFACE_LIGHT_SQUARE = pygame.Surface((SQUARE_LENGTH, SQUARE_LENGTH))
+SURFACE_LIGHT_SQUARE = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE))
 SURFACE_LIGHT_SQUARE.fill(COLOR_LIGHT_SQUARE)
 
-SURFACE_DARK_SQUARE = pygame.Surface((SQUARE_LENGTH, SQUARE_LENGTH))
+SURFACE_DARK_SQUARE = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE))
 SURFACE_DARK_SQUARE.fill(COLOR_DARK_SQUARE)
 
 DICT_PIECES = {
-    "k": pygame.image.load_sized_svg("assets/bK.svg", (SQUARE_LENGTH, SQUARE_LENGTH)),
-    "q": pygame.image.load_sized_svg("assets/bQ.svg", (SQUARE_LENGTH, SQUARE_LENGTH)),
-    "r": pygame.image.load_sized_svg("assets/bR.svg", (SQUARE_LENGTH, SQUARE_LENGTH)),
-    "b": pygame.image.load_sized_svg("assets/bB.svg", (SQUARE_LENGTH, SQUARE_LENGTH)),
-    "n": pygame.image.load_sized_svg("assets/bN.svg", (SQUARE_LENGTH, SQUARE_LENGTH)),
-    "p": pygame.image.load_sized_svg("assets/bP.svg", (SQUARE_LENGTH, SQUARE_LENGTH)),
-    "K": pygame.image.load_sized_svg("assets/wK.svg", (SQUARE_LENGTH, SQUARE_LENGTH)),
-    "Q": pygame.image.load_sized_svg("assets/wQ.svg", (SQUARE_LENGTH, SQUARE_LENGTH)),
-    "R": pygame.image.load_sized_svg("assets/wR.svg", (SQUARE_LENGTH, SQUARE_LENGTH)),
-    "B": pygame.image.load_sized_svg("assets/wB.svg", (SQUARE_LENGTH, SQUARE_LENGTH)),
-    "N": pygame.image.load_sized_svg("assets/wN.svg", (SQUARE_LENGTH, SQUARE_LENGTH)),
-    "P": pygame.image.load_sized_svg("assets/wP.svg", (SQUARE_LENGTH, SQUARE_LENGTH)),
+    "k": pygame.image.load_sized_svg("assets/bK.svg", (SQUARE_SIZE, SQUARE_SIZE)),
+    "q": pygame.image.load_sized_svg("assets/bQ.svg", (SQUARE_SIZE, SQUARE_SIZE)),
+    "r": pygame.image.load_sized_svg("assets/bR.svg", (SQUARE_SIZE, SQUARE_SIZE)),
+    "b": pygame.image.load_sized_svg("assets/bB.svg", (SQUARE_SIZE, SQUARE_SIZE)),
+    "n": pygame.image.load_sized_svg("assets/bN.svg", (SQUARE_SIZE, SQUARE_SIZE)),
+    "p": pygame.image.load_sized_svg("assets/bP.svg", (SQUARE_SIZE, SQUARE_SIZE)),
+    "K": pygame.image.load_sized_svg("assets/wK.svg", (SQUARE_SIZE, SQUARE_SIZE)),
+    "Q": pygame.image.load_sized_svg("assets/wQ.svg", (SQUARE_SIZE, SQUARE_SIZE)),
+    "R": pygame.image.load_sized_svg("assets/wR.svg", (SQUARE_SIZE, SQUARE_SIZE)),
+    "B": pygame.image.load_sized_svg("assets/wB.svg", (SQUARE_SIZE, SQUARE_SIZE)),
+    "N": pygame.image.load_sized_svg("assets/wN.svg", (SQUARE_SIZE, SQUARE_SIZE)),
+    "P": pygame.image.load_sized_svg("assets/wP.svg", (SQUARE_SIZE, SQUARE_SIZE)),
 }
 
-CURSOR_SIZE = SQUARE_LENGTH / 3
+CURSOR_SIZE = SQUARE_SIZE / 3
 CURSOR_OUTSET = 10  # Outset cursor pieces from square corners
 
 CURSOR_CORNER = 4
@@ -49,5 +49,16 @@ SURFACE_CURSOR_NE = pygame.transform.flip(SURFACE_CURSOR_NW, flip_x=True, flip_y
 SURFACE_CURSOR_SE = pygame.transform.flip(SURFACE_CURSOR_NW, flip_x=True, flip_y=True)
 SURFACE_CURSOR_SW = pygame.transform.flip(SURFACE_CURSOR_NW, flip_x=False, flip_y=True)
 
+SELECTOR_SIZE = SQUARE_SIZE / 2
+s = SELECTOR_SIZE
+
+SURFACE_SELECTOR = pygame.Surface((SELECTOR_SIZE, SELECTOR_SIZE), flags=pygame.SRCALPHA)
+SURFACE_SELECTOR.fill(COLOR_NONE)
+pygame.draw.polygon(SURFACE_SELECTOR, COLOR_CURSOR_OUTLINE,
+                    [[s, s / 2], [s / 2, 0], [s / 2, s * 3/8], [0, s * 3/8],
+                     [0, s * 5/8], [s / 2, s * 5/8], [s / 2, s]])
+
 KEY_REPEAT_MINIMUM = 15
 KEY_REPEAT_PERIOD = 7
+
+MENU_OPTIONS = 1
