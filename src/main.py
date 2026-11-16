@@ -5,6 +5,8 @@ Usage:
     python main.py
 """
 
+from collections.abc import Callable
+
 import chess
 import pygame
 
@@ -27,6 +29,15 @@ class App:
         self.board = chess.Board()
         self.cursor = self.Cursor(self)
 
+        self.keyMap: dict[int, Callable[[], None]] = {
+            pygame.K_w: self.cursor.moveUp,
+            pygame.K_s: self.cursor.moveDown,
+            pygame.K_a: self.cursor.moveLeft,
+            pygame.K_d: self.cursor.moveRight,
+        }
+        self.keyHeldTicks: int | None = None
+        self.keyHeld: int | None = None
+
     def mainloop(self) -> App:
         """
         Run the app. Blocks until the app is quit (e.g., by clicking the "X"
@@ -35,8 +46,8 @@ class App:
 
         self.running = True
         while self.running:
-            self.render()
             self.handleEvents()
+            self.render()
     
             pygame.display.flip()
             self.clock.tick(60)
@@ -47,8 +58,30 @@ class App:
         """Handle controls and OS-level app interactions."""
         
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
+            match event.type:
+                case pygame.QUIT:
+                    self.running = False
+                    return
+                
+                case pygame.KEYDOWN:
+                    k: int = event.key
+                    if k in self.keyMap:
+                        self.keyHeld = k
+                        self.keyHeldTicks = 0
+                        self.keyMap[k]()
+
+                case pygame.KEYUP:
+                    k: int = event.key
+                    if k == self.keyHeld:
+                        self.keyHeld = None
+                        self.keyHeldTicks = None
+
+        # Handle holding keys down (repeated action)
+        if self.keyHeld is not None and self.keyHeldTicks is not None:
+            self.keyHeldTicks += 1
+            ticks = self.keyHeldTicks - KEY_REPEAT_MINIMUM
+            if ticks > 0 and ticks % KEY_REPEAT_PERIOD == 0:
+                self.keyMap[self.keyHeld]()
 
     def _pointOfCoords(self, row: int, col: int) -> tuple[float, float]:
         return (self.screen.width // 2 + (col - 4) * SQUARE_LENGTH,
@@ -83,6 +116,22 @@ class App:
             self.row = 0
             self.col = 0
             self.appInstance = appInstance
+
+        def moveUp(self) -> None:
+            if self.row > 0:
+                self.row -= 1
+
+        def moveDown(self) -> None:
+            if self.row < 8 - 1:
+                self.row += 1
+
+        def moveLeft(self) -> None:
+            if self.col > 0:
+                self.col -= 1
+
+        def moveRight(self) -> None:
+            if self.col < 8 - 1:
+                self.col += 1
 
         def drawSelf(self) -> None:
             nwX, nwY = self.appInstance._pointOfCoords(self.row, self.col)

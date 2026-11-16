@@ -48,3 +48,6 @@ pygame.draw.polygon(SURFACE_CURSOR_NW, COLOR_CURSOR_BODY,
 SURFACE_CURSOR_NE = pygame.transform.flip(SURFACE_CURSOR_NW, flip_x=True, flip_y=False)
 SURFACE_CURSOR_SE = pygame.transform.flip(SURFACE_CURSOR_NW, flip_x=True, flip_y=True)
 SURFACE_CURSOR_SW = pygame.transform.flip(SURFACE_CURSOR_NW, flip_x=False, flip_y=True)
+
+KEY_REPEAT_MINIMUM = 15
+KEY_REPEAT_PERIOD = 7
