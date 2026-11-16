@@ -35,6 +35,7 @@ class App:
             pygame.K_a: self.cursor.moveLeft,
             pygame.K_d: self.cursor.moveRight,
         }
+        self.holdableKeys = [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]
         self.keyHeldTicks: int | None = None
         self.keyHeld: int | None = None
 
@@ -66,9 +67,11 @@ class App:
                 case pygame.KEYDOWN:
                     k: int = event.key
                     if k in self.keyMap:
-                        self.keyHeld = k
-                        self.keyHeldTicks = 0
                         self.keyMap[k]()
+
+                        if k in self.holdableKeys:
+                            self.keyHeld = k
+                            self.keyHeldTicks = 0
 
                 case pygame.KEYUP:
                     k: int = event.key
