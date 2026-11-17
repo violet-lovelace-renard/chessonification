@@ -25,7 +25,8 @@ class App:
         self.clock: pygame.Clock = pygame.time.Clock()
 
         self.board: chess.Board = chess.Board()
-        self.hovered: tuple[int, int] | None = None
+        self.hoveredSquare: tuple[int, int] | None = None
+        self.selectedSquare: tuple[int, int] | None = None
 
     def mainloop(self) -> App:
         """
@@ -51,8 +52,10 @@ class App:
                 case pygame.QUIT:
                     self.running = False
                     return
+                case pygame.MOUSEBUTTONDOWN:
+                    self.selectedSquare = self._squareOfPoint(*pygame.mouse.get_pos())
 
-        self.hovered = self._squareOfPoint(*pygame.mouse.get_pos())
+        self.hoveredSquare = self._squareOfPoint(*pygame.mouse.get_pos())
 
     def render(self) -> None:
         """Draw a new frame containing the background and board state."""
@@ -63,8 +66,11 @@ class App:
                          7 - chess.square_rank(square), chess.square_file(square))
                          for square, piece in self.board.piece_map().items()]
 
-        if self.hovered is not None:
-            self._drawCursor(*self._pointOfSquare(*self.hovered))
+        if self.hoveredSquare is not None and\
+                not self.hoveredSquare == self.selectedSquare:
+            self._drawCursor(*self._pointOfSquare(*self.hoveredSquare))
+        if self.selectedSquare:
+            self._drawSelection(*self._pointOfSquare(*self.selectedSquare))
 
     def close(self) -> None:
         """Frees resources held by this app instance."""
@@ -89,6 +95,16 @@ class App:
         self.screen.blit(DICT_PIECES[piece], self._pointOfSquare(row, col))
 
     def _drawCursor(self, x: float, y: float) -> None:
+        nwX, nwY = x, y
+        nwX, nwY = nwX - CURSOR_OUTSET, nwY - CURSOR_OUTSET
+        otherSide = SQUARE_SIZE - CURSOR_SIZE + 2 * CURSOR_OUTSET
+
+        self.screen.blit(SURFACE_CURSOR_SE, (nwX,             nwY))
+        self.screen.blit(SURFACE_CURSOR_SW, (nwX + otherSide, nwY))
+        self.screen.blit(SURFACE_CURSOR_NW, (nwX + otherSide, nwY + otherSide))
+        self.screen.blit(SURFACE_CURSOR_NE, (nwX,             nwY + otherSide))
+
+    def _drawSelection(self, x: float, y: float) -> None:
         nwX, nwY = x, y
         nwX, nwY = nwX - CURSOR_OUTSET, nwY - CURSOR_OUTSET
         otherSide = SQUARE_SIZE - CURSOR_SIZE + 2 * CURSOR_OUTSET
