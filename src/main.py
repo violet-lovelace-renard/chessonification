@@ -78,20 +78,20 @@ class App:
         pygame.quit()
 
     def _handleClick(self) -> None:
-        if self.selectedSquare is None:
+        if not self.selectedSquare:
             square = self._squareOfPoint(pygame.mouse.get_pos())
-            if square is None:
+            if not square:
                 return
     
             piece = self.board.piece_at(chess.square(square[1], 7 - square[0]))
-            if piece is None:
+            if not piece:
                 return
     
             self.selectedSquare = square
             self.selectedPiece = piece
         else:
             square = self._squareOfPoint(pygame.mouse.get_pos())
-            if square is None:
+            if not square:
                 self.selectedSquare = None
                 self.selectedPiece = None
                 return
@@ -148,22 +148,21 @@ class App:
         self.screen.blit(DICT_PIECES[piece], (x, y))
 
     def _drawSelectedPiece(self) -> None:
-        if self.selectedSquare is None:
+        if not self.selectedSquare:
             return
 
         self._drawSquare(self.selectedSquare, transparent=True)
 
     def _drawTargetPiece(self) -> None:
-        if self.selectedPiece is None:
+        if not self.selectedPiece:
             return
 
         x, y = pygame.mouse.get_pos()
         self._drawPiece(self.selectedPiece.symbol(), (x, y))
 
     def _setCursor(self) -> None:
-        if self.selectedPiece is None and\
-            not (self.hoveredSquare is not None and
-                self._getPieceAt(self.hoveredSquare) is not None):
+        if not self.selectedPiece and\
+            not (self.hoveredSquare and self._getPieceAt(self.hoveredSquare)):
             pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_ARROW))
         else:
             pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_HAND))
