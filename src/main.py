@@ -62,6 +62,8 @@ class App:
         """Draw a new frame containing the background and board state."""
 
         self.screen.fill(COLOR_BACKGROUND)
+        self.screen.blit(SURFACE_EXIT_BUTTON, EXIT_BUTTON_POSITION)
+
         [self._drawSquare((r, c)) for r in range(8) for c in range(8)]
         [self._drawPiece(piece.symbol(),
                          self._pointOfChessSquare(square))
@@ -78,8 +80,17 @@ class App:
         pygame.quit()
 
     def _handleClick(self) -> None:
+        mousePos = pygame.mouse.get_pos()
+
+        if mousePos[0] > EXIT_BUTTON_POSITION[0] and\
+                mousePos[0] < EXIT_BUTTON_POSITION[0] + EXIT_BUTTON_SIZE and\
+                mousePos[1] > EXIT_BUTTON_POSITION[1] and\
+                mousePos[1] < EXIT_BUTTON_POSITION[1] + EXIT_BUTTON_SIZE:
+            self.running = False
+            return
+
         if not self.selectedSquare:
-            square = self._squareOfPoint(pygame.mouse.get_pos())
+            square = self._squareOfPoint(mousePos)
             if not square:
                 return
     
@@ -90,7 +101,7 @@ class App:
             self.selectedSquare = square
             self.selectedPiece = piece
         else:
-            square = self._squareOfPoint(pygame.mouse.get_pos())
+            square = self._squareOfPoint(mousePos)
             if not square:
                 self.selectedSquare = None
                 self.selectedPiece = None

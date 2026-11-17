@@ -21,6 +21,24 @@ SURFACE_DARK_SQUARE.fill(COLOR_DARK_SQUARE)
 SURFACE_DARK_SQUARE_TRANSPARENT = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), flags=pygame.SRCALPHA)
 SURFACE_DARK_SQUARE_TRANSPARENT.fill(COLOR_DARK_SQUARE_TRANSPARENT)
 
+EXIT_BUTTON_SIZE = SQUARE_SIZE / 2
+EXIT_BUTTON_CORNER_DISTANCE = 5
+EXIT_BUTTON_PADDING = 10
+EXIT_X_SIZE = EXIT_BUTTON_SIZE - 2 * EXIT_BUTTON_PADDING
+EXIT_BUTTON_POSITION = [SQUARE_SIZE, SQUARE_SIZE]
+
+SURFACE_EXIT_BUTTON = pygame.Surface((EXIT_BUTTON_SIZE, EXIT_BUTTON_SIZE))
+SURFACE_EXIT_BUTTON.fill(COLOR_DARK_SQUARE)
+d = EXIT_BUTTON_CORNER_DISTANCE
+s = EXIT_X_SIZE
+xPoints = [[d, 0], [s/2, s/2-d], [s-d, 0],
+           [s, d], [s/2+d, s/2], [s, s-d],
+           [s-d, s], [s/2, s/2+d], [d, s],
+           [0, s-d], [s/2-d, s/2], [0, d]]
+xPoints = [(x + EXIT_BUTTON_PADDING, y + EXIT_BUTTON_PADDING)
+                for [x, y] in xPoints]
+pygame.draw.polygon(SURFACE_EXIT_BUTTON, COLOR_LIGHT_SQUARE, xPoints)
+
 DICT_PIECES = {
     "k": pygame.image.load_sized_svg("assets/bK.svg", (SQUARE_SIZE, SQUARE_SIZE)),
     "q": pygame.image.load_sized_svg("assets/bQ.svg", (SQUARE_SIZE, SQUARE_SIZE)),
