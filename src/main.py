@@ -27,6 +27,7 @@ class App:
         self.board: chess.Board = chess.Board()
         self.hoveredSquare: tuple[int, int] | None = None
         self.selectedSquare: tuple[int, int] | None = None
+        self.selectedPiece: chess.Piece | None = None
 
     def mainloop(self) -> App:
         """
@@ -53,7 +54,15 @@ class App:
                     self.running = False
                     return
                 case pygame.MOUSEBUTTONDOWN:
-                    self.selectedSquare = self._squareOfPoint(*pygame.mouse.get_pos())
+                    square = self._squareOfPoint(*pygame.mouse.get_pos())
+                    if square is None:
+                        continue
+                    piece = self.board.piece_at(chess.square(square[1], 7 - square[0]))
+                    if piece is None:
+                        continue
+
+                    self.selectedSquare = square
+                    self.selectedPiece = piece
 
         self.hoveredSquare = self._squareOfPoint(*pygame.mouse.get_pos())
 
@@ -63,21 +72,23 @@ class App:
         self.screen.fill(COLOR_BACKGROUND)
         [self._drawSquare(r, c) for r in range(8) for c in range(8)]
         [self._drawPiece(piece.symbol(),
-                         7 - chess.square_rank(square), chess.square_file(square))
+                         *self._pointOfRankFile(chess.square_rank(square),
+                                                chess.square_file(square)))
                          for square, piece in self.board.piece_map().items()]
 
-        if self.hoveredSquare is not None and\
-                not self.hoveredSquare == self.selectedSquare:
-            self._drawCursor(*self._pointOfSquare(*self.hoveredSquare))
-        if self.selectedSquare:
-            self._drawSelection(*self._pointOfSquare(*self.selectedSquare))
+        self._drawSelectedPiece()
+        self._drawTargetPiece()
 
     def close(self) -> None:
         """Frees resources held by this app instance."""
 
         pygame.quit()
 
-    def _pointOfSquare(self, row: int, col: int) -> tuple[float, float]:
+    def _pointOfRankFile(self, rank: int, file: int) -> tuple[float, float]:
+        return (self.screen.width // 2 + (file - 4) * SQUARE_SIZE,
+                self.screen.height // 2 + ((7 - rank) - 4) * SQUARE_SIZE)
+
+    def _pointOfRowCol(self, row: int, col: int) -> tuple[float, float]:
         return (self.screen.width // 2 + (col - 4) * SQUARE_SIZE,
                 self.screen.height // 2 + (row - 4) * SQUARE_SIZE)
 
@@ -86,33 +97,34 @@ class App:
                   int((x - self.screen.width // 2) // SQUARE_SIZE + 4))
         return None if r < 0 or r >= 8 or c < 0 or c >= 8 else (r, c)
 
-    def _drawSquare(self, row: int, col: int) -> None:
-        s = SURFACE_LIGHT_SQUARE if (row + col) % 2 == 0\
-                else SURFACE_DARK_SQUARE
-        self.screen.blit(s, self._pointOfSquare(row, col))
+    def _drawSquare(self, row: int, col: int, transparent: bool=False) -> None:
+        match (row + col) % 2 == 0, transparent:
+            case True, True:
+                s = SURFACE_LIGHT_SQUARE_TRANSPARENT
+            case True, False:
+                s = SURFACE_LIGHT_SQUARE
+            case False, True:
+                s = SURFACE_DARK_SQUARE_TRANSPARENT
+            case False, False:
+                s = SURFACE_DARK_SQUARE
 
-    def _drawPiece(self, piece: str, row: int, col: int) -> None:
-        self.screen.blit(DICT_PIECES[piece], self._pointOfSquare(row, col))
+        self.screen.blit(s, self._pointOfRowCol(row, col))
 
-    def _drawCursor(self, x: float, y: float) -> None:
-        nwX, nwY = x, y
-        nwX, nwY = nwX - CURSOR_OUTSET, nwY - CURSOR_OUTSET
-        otherSide = SQUARE_SIZE - CURSOR_SIZE + 2 * CURSOR_OUTSET
+    def _drawPiece(self, piece: str, x: float, y: float) -> None:
+        self.screen.blit(DICT_PIECES[piece], (x, y))
 
-        self.screen.blit(SURFACE_CURSOR_SE, (nwX,             nwY))
-        self.screen.blit(SURFACE_CURSOR_SW, (nwX + otherSide, nwY))
-        self.screen.blit(SURFACE_CURSOR_NW, (nwX + otherSide, nwY + otherSide))
-        self.screen.blit(SURFACE_CURSOR_NE, (nwX,             nwY + otherSide))
+    def _drawSelectedPiece(self) -> None:
+        if self.selectedSquare is None:
+            return
 
-    def _drawSelection(self, x: float, y: float) -> None:
-        nwX, nwY = x, y
-        nwX, nwY = nwX - CURSOR_OUTSET, nwY - CURSOR_OUTSET
-        otherSide = SQUARE_SIZE - CURSOR_SIZE + 2 * CURSOR_OUTSET
+        self._drawSquare(*self.selectedSquare, transparent=True)
 
-        self.screen.blit(SURFACE_CURSOR_NW, (nwX,             nwY))
-        self.screen.blit(SURFACE_CURSOR_NE, (nwX + otherSide, nwY))
-        self.screen.blit(SURFACE_CURSOR_SE, (nwX + otherSide, nwY + otherSide))
-        self.screen.blit(SURFACE_CURSOR_SW, (nwX,             nwY + otherSide))
+    def _drawTargetPiece(self) -> None:
+        if self.selectedPiece is None:
+            return
+
+        x, y = pygame.mouse.get_pos()
+        self._drawPiece(self.selectedPiece.symbol(), x, y)
 
 
 def main() -> None:
