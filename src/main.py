@@ -6,7 +6,6 @@ Usage:
 """
 
 # TODO: change mouse cursor to respond to hovering over pieces
-# TODO: validate move
 
 import chess
 import pygame
@@ -98,9 +97,11 @@ class App:
                 self.selectedPiece = None
                 return
 
+            # TODO: account for promotion
             tryMove = chess.Move(from_square=self._chessSquare(self.selectedSquare),
                                  to_square=self._chessSquare(square))
-            self.board.push(tryMove)
+            if self.board.is_legal(tryMove):
+                self.board.push(tryMove)
 
             self.selectedSquare = None
             self.selectedPiece = None
