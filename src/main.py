@@ -25,8 +25,7 @@ class App:
         self.clock: pygame.Clock = pygame.time.Clock()
 
         self.board: chess.Board = chess.Board()
-        self.cursor = self.Cursor()
-        self.selectedSquare: tuple[int, int] | None = None
+        self.hovered: tuple[int, int] | None = None
 
     def mainloop(self) -> App:
         """
@@ -53,7 +52,24 @@ class App:
                     self.running = False
                     return
 
-        self.selectedSquare = self._squareOfPoint(*pygame.mouse.get_pos())
+        self.hovered = self._squareOfPoint(*pygame.mouse.get_pos())
+
+    def render(self) -> None:
+        """Draw a new frame containing the background and board state."""
+
+        self.screen.fill(COLOR_BACKGROUND)
+        [self._drawSquare(r, c) for r in range(8) for c in range(8)]
+        [self._drawPiece(piece.symbol(),
+                         7 - chess.square_rank(square), chess.square_file(square))
+                         for square, piece in self.board.piece_map().items()]
+
+        if self.hovered is not None:
+            self._drawCursor(*self._pointOfSquare(*self.hovered))
+
+    def close(self) -> None:
+        """Frees resources held by this app instance."""
+
+        pygame.quit()
 
     def _pointOfSquare(self, row: int, col: int) -> tuple[float, float]:
         return (self.screen.width // 2 + (col - 4) * SQUARE_SIZE,
@@ -64,42 +80,23 @@ class App:
                   int((x - self.screen.width // 2) // SQUARE_SIZE + 4))
         return None if r < 0 or r >= 8 or c < 0 or c >= 8 else (r, c)
 
-    def render(self) -> None:
-        """Draw a new frame containing the background and board state."""
+    def _drawSquare(self, row: int, col: int) -> None:
+        s = SURFACE_LIGHT_SQUARE if (row + col) % 2 == 0\
+                else SURFACE_DARK_SQUARE
+        self.screen.blit(s, self._pointOfSquare(row, col))
 
-        def drawSquare(row: int, col: int) -> None:
-            s = SURFACE_LIGHT_SQUARE if (row + col) % 2 == 0\
-                    else SURFACE_DARK_SQUARE
-            self.screen.blit(s, self._pointOfSquare(row, col))
+    def _drawPiece(self, piece: str, row: int, col: int) -> None:
+        self.screen.blit(DICT_PIECES[piece], self._pointOfSquare(row, col))
 
-        def drawPiece(piece: str, row: int, col: int) -> None:
-            self.screen.blit(DICT_PIECES[piece], self._pointOfSquare(row, col))
+    def _drawCursor(self, x: float, y: float) -> None:
+        nwX, nwY = x, y
+        nwX, nwY = nwX - CURSOR_OUTSET, nwY - CURSOR_OUTSET
+        otherSide = SQUARE_SIZE - CURSOR_SIZE + 2 * CURSOR_OUTSET
 
-        self.screen.fill(COLOR_BACKGROUND)
-        [drawSquare(r, c) for r in range(8) for c in range(8)]
-        [drawPiece(piece.symbol(),
-                   7 - chess.square_rank(square), chess.square_file(square))
-         for square, piece in self.board.piece_map().items()]
-
-        if self.selectedSquare is not None:
-            self.cursor.drawSelf(self.screen,
-                                 *self._pointOfSquare(*self.selectedSquare))
-
-    def close(self) -> None:
-        """Frees resources held by this app instance."""
-
-        pygame.quit()
-
-    class Cursor:
-        def drawSelf(self, surf: pygame.Surface, x: float, y: float) -> None:
-            nwX, nwY = x, y
-            nwX, nwY = nwX - CURSOR_OUTSET, nwY - CURSOR_OUTSET
-            otherSide = SQUARE_SIZE - CURSOR_SIZE + 2 * CURSOR_OUTSET
-
-            surf.blit(SURFACE_CURSOR_NW, (nwX,             nwY))
-            surf.blit(SURFACE_CURSOR_NE, (nwX + otherSide, nwY))
-            surf.blit(SURFACE_CURSOR_SE, (nwX + otherSide, nwY + otherSide))
-            surf.blit(SURFACE_CURSOR_SW, (nwX,             nwY + otherSide))
+        self.screen.blit(SURFACE_CURSOR_NW, (nwX,             nwY))
+        self.screen.blit(SURFACE_CURSOR_NE, (nwX + otherSide, nwY))
+        self.screen.blit(SURFACE_CURSOR_SE, (nwX + otherSide, nwY + otherSide))
+        self.screen.blit(SURFACE_CURSOR_SW, (nwX,             nwY + otherSide))
 
 
 def main() -> None:
