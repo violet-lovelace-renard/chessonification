@@ -70,6 +70,8 @@ class App:
         self._drawSelectedPiece()
         self._drawTargetPiece()
 
+        self._setCursor()
+
     def close(self) -> None:
         """Frees resources held by this app instance."""
 
@@ -102,6 +104,10 @@ class App:
 
             self.selectedSquare = None
             self.selectedPiece = None
+
+    def _getPieceAt(self, rowCol: tuple[int, int]) -> chess.Piece | None:
+        return self.board.piece_at(chess.square(rowCol[1], 7 - rowCol[0]))
+
 
     def _chessSquareOfPoint(self, rowCol: tuple[int, int]) -> chess.Square:
         r, c = rowCol
@@ -153,6 +159,14 @@ class App:
 
         x, y = pygame.mouse.get_pos()
         self._drawPiece(self.selectedPiece.symbol(), (x, y))
+
+    def _setCursor(self) -> None:
+        if self.selectedPiece is None and\
+            not (self.hoveredSquare is not None and
+                self._getPieceAt(self.hoveredSquare) is not None):
+            pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_ARROW))
+        else:
+            pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_HAND))
 
 
 def main() -> None:
