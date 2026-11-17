@@ -3,6 +3,9 @@ import pygame
 COLOR_BACKGROUND = pygame.Color.from_hex("#323232")
 COLOR_LIGHT_SQUARE = pygame.Color.from_hex("#debfff")
 COLOR_DARK_SQUARE = pygame.Color.from_hex("#8128e0")
+COLOR_CURSOR_BODY = pygame.Color.from_hex("#eeeeee")
+COLOR_CURSOR_OUTLINE = pygame.Color.from_hex("#111111")
+COLOR_NONE = pygame.Color.from_hex("#00000000")
 
 SQUARE_SIZE = 96
 
@@ -26,3 +29,21 @@ DICT_PIECES = {
     "N": pygame.image.load_sized_svg("assets/wN.svg", (SQUARE_SIZE, SQUARE_SIZE)),
     "P": pygame.image.load_sized_svg("assets/wP.svg", (SQUARE_SIZE, SQUARE_SIZE)),
 }
+CURSOR_SIZE = SQUARE_SIZE / 3
+CURSOR_OUTSET = 10  # Outset cursor pieces from square corners
+
+CURSOR_CORNER = 4
+CURSOR_LEG = CURSOR_CORNER + CURSOR_CORNER * 1.41  # sqrt(2) for diagonal
+
+SURFACE_CURSOR_NW = pygame.Surface((CURSOR_SIZE, CURSOR_SIZE), flags=pygame.SRCALPHA)
+SURFACE_CURSOR_NW.fill(COLOR_NONE)
+pygame.draw.polygon(SURFACE_CURSOR_NW, COLOR_CURSOR_OUTLINE,
+                    [[0, 0], [CURSOR_SIZE, 0], [0, CURSOR_SIZE]])
+pygame.draw.polygon(SURFACE_CURSOR_NW, COLOR_CURSOR_BODY,
+                    [[CURSOR_CORNER, CURSOR_CORNER],
+                     [CURSOR_SIZE - CURSOR_LEG, CURSOR_CORNER],
+                     [CURSOR_CORNER, CURSOR_SIZE - CURSOR_LEG]])
+
+SURFACE_CURSOR_NE = pygame.transform.flip(SURFACE_CURSOR_NW, flip_x=True, flip_y=False)
+SURFACE_CURSOR_SE = pygame.transform.flip(SURFACE_CURSOR_NW, flip_x=True, flip_y=True)
+SURFACE_CURSOR_SW = pygame.transform.flip(SURFACE_CURSOR_NW, flip_x=False, flip_y=True)
