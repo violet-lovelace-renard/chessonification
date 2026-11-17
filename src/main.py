@@ -5,8 +5,6 @@ Usage:
     python main.py
 """
 
-# TODO: change mouse cursor to respond to hovering over pieces
-
 import chess
 import pygame
 
@@ -58,16 +56,15 @@ class App:
                 case pygame.MOUSEBUTTONDOWN:
                     self._handleClick()
 
-        self.hoveredSquare = self._squareOfPoint(*pygame.mouse.get_pos())
+        self.hoveredSquare = self._squareOfPoint(pygame.mouse.get_pos())
 
     def render(self) -> None:
         """Draw a new frame containing the background and board state."""
 
         self.screen.fill(COLOR_BACKGROUND)
-        [self._drawSquare(r, c) for r in range(8) for c in range(8)]
+        [self._drawSquare((r, c)) for r in range(8) for c in range(8)]
         [self._drawPiece(piece.symbol(),
-                         *self._pointOfRankFile(chess.square_rank(square),
-                                                chess.square_file(square)))
+                         self._pointOfChessSquare(square))
                          for square, piece in self.board.piece_map().items()]
 
         self._drawSelectedPiece()
@@ -80,7 +77,7 @@ class App:
 
     def _handleClick(self) -> None:
         if self.selectedSquare is None:
-            square = self._squareOfPoint(*pygame.mouse.get_pos())
+            square = self._squareOfPoint(pygame.mouse.get_pos())
             if square is None:
                 return
     
@@ -91,39 +88,43 @@ class App:
             self.selectedSquare = square
             self.selectedPiece = piece
         else:
-            square = self._squareOfPoint(*pygame.mouse.get_pos())
+            square = self._squareOfPoint(pygame.mouse.get_pos())
             if square is None:
                 self.selectedSquare = None
                 self.selectedPiece = None
                 return
 
             # TODO: account for promotion
-            tryMove = chess.Move(from_square=self._chessSquare(self.selectedSquare),
-                                 to_square=self._chessSquare(square))
+            tryMove = chess.Move(from_square=self._chessSquareOfPoint(self.selectedSquare),
+                                 to_square=self._chessSquareOfPoint(square))
             if self.board.is_legal(tryMove):
                 self.board.push(tryMove)
 
             self.selectedSquare = None
             self.selectedPiece = None
 
-    def _chessSquare(self, rowCol: tuple[int, int]) -> chess.Square:
+    def _chessSquareOfPoint(self, rowCol: tuple[int, int]) -> chess.Square:
         r, c = rowCol
         return chess.square(rank_index=7 - r, file_index=c)
 
-    def _pointOfRankFile(self, rank: int, file: int) -> tuple[float, float]:
+    def _pointOfChessSquare(self, square: chess.Square) -> tuple[float, float]:
+        file, rank = chess.square_file(square), chess.square_rank(square)
         return (self.screen.width // 2 + (file - 4) * SQUARE_SIZE,
                 self.screen.height // 2 + ((7 - rank) - 4) * SQUARE_SIZE)
 
-    def _pointOfRowCol(self, row: int, col: int) -> tuple[float, float]:
+    def _pointOfRowCol(self, rowCol: tuple[int, int]) -> tuple[float, float]:
+        row, col = rowCol
         return (self.screen.width // 2 + (col - 4) * SQUARE_SIZE,
                 self.screen.height // 2 + (row - 4) * SQUARE_SIZE)
 
-    def _squareOfPoint(self, x: float, y: float) -> tuple[int, int] | None:
+    def _squareOfPoint(self, xY: tuple[float, float]) -> tuple[int, int] | None:
+        x, y = xY
         r, c = (int((y - self.screen.height // 2) // SQUARE_SIZE + 4),
                   int((x - self.screen.width // 2) // SQUARE_SIZE + 4))
         return None if r < 0 or r >= 8 or c < 0 or c >= 8 else (r, c)
 
-    def _drawSquare(self, row: int, col: int, transparent: bool=False) -> None:
+    def _drawSquare(self, rowCol: tuple[int, int], transparent: bool=False) -> None:
+        row, col = rowCol
         match (row + col) % 2 == 0, transparent:
             case True, True:
                 s = SURFACE_LIGHT_SQUARE_TRANSPARENT
@@ -134,23 +135,24 @@ class App:
             case False, False:
                 s = SURFACE_DARK_SQUARE
 
-        self.screen.blit(s, self._pointOfRowCol(row, col))
+        self.screen.blit(s, self._pointOfRowCol((row, col)))
 
-    def _drawPiece(self, piece: str, x: float, y: float) -> None:
+    def _drawPiece(self, piece: str, xY: tuple[float, float]) -> None:
+        x, y = xY
         self.screen.blit(DICT_PIECES[piece], (x, y))
 
     def _drawSelectedPiece(self) -> None:
         if self.selectedSquare is None:
             return
 
-        self._drawSquare(*self.selectedSquare, transparent=True)
+        self._drawSquare(self.selectedSquare, transparent=True)
 
     def _drawTargetPiece(self) -> None:
         if self.selectedPiece is None:
             return
 
         x, y = pygame.mouse.get_pos()
-        self._drawPiece(self.selectedPiece.symbol(), x, y)
+        self._drawPiece(self.selectedPiece.symbol(), (x, y))
 
 
 def main() -> None:
