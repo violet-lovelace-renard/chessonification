@@ -5,6 +5,9 @@ Usage:
     python main.py
 """
 
+# TODO: change mouse cursor to respond to hovering over pieces
+# TODO: validate move
+
 import chess
 import pygame
 
@@ -54,15 +57,7 @@ class App:
                     self.running = False
                     return
                 case pygame.MOUSEBUTTONDOWN:
-                    square = self._squareOfPoint(*pygame.mouse.get_pos())
-                    if square is None:
-                        continue
-                    piece = self.board.piece_at(chess.square(square[1], 7 - square[0]))
-                    if piece is None:
-                        continue
-
-                    self.selectedSquare = square
-                    self.selectedPiece = piece
+                    self._handleClick()
 
         self.hoveredSquare = self._squareOfPoint(*pygame.mouse.get_pos())
 
@@ -83,6 +78,36 @@ class App:
         """Frees resources held by this app instance."""
 
         pygame.quit()
+
+    def _handleClick(self) -> None:
+        if self.selectedSquare is None:
+            square = self._squareOfPoint(*pygame.mouse.get_pos())
+            if square is None:
+                return
+    
+            piece = self.board.piece_at(chess.square(square[1], 7 - square[0]))
+            if piece is None:
+                return
+    
+            self.selectedSquare = square
+            self.selectedPiece = piece
+        else:
+            square = self._squareOfPoint(*pygame.mouse.get_pos())
+            if square is None:
+                self.selectedSquare = None
+                self.selectedPiece = None
+                return
+
+            tryMove = chess.Move(from_square=self._chessSquare(self.selectedSquare),
+                                 to_square=self._chessSquare(square))
+            self.board.push(tryMove)
+
+            self.selectedSquare = None
+            self.selectedPiece = None
+
+    def _chessSquare(self, rowCol: tuple[int, int]) -> chess.Square:
+        r, c = rowCol
+        return chess.square(rank_index=7 - r, file_index=c)
 
     def _pointOfRankFile(self, rank: int, file: int) -> tuple[float, float]:
         return (self.screen.width // 2 + (file - 4) * SQUARE_SIZE,
