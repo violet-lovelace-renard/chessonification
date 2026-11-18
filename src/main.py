@@ -182,9 +182,6 @@ class App:
         self._drawPiece(self.selectedPiece.symbol(), (x, y))
 
     def _drawTurnIndicator(self) -> None:
-        """
-        return (self.screen.width // 2 + (file - 4) * SQUARE_SIZE,
-                        self.screen.height // 2 + ((7 - rank) - 4) * SQUARE_SIZE)"""
         posX = self.screen.width / 2 + 4 * SQUARE_SIZE + TURN_INDICATOR_MARGIN
         if self.board.turn == chess.WHITE:
             posY = self.screen.height / 2 + SQUARE_SIZE / 2 - TURN_INDICATOR_SIZE / 2
