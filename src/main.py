@@ -54,7 +54,10 @@ class App:
                     self.running = False
                     return
                 case pygame.MOUSEBUTTONDOWN:
-                    self._handleClick()
+                    if event.button == pygame.BUTTON_LEFT:
+                        self._handleClick()
+                    elif event.button == pygame.BUTTON_RIGHT:
+                        self._handleRightClick()
 
         self.hoveredSquare = self._squareOfPoint(pygame.mouse.get_pos())
 
@@ -79,6 +82,12 @@ class App:
         """Frees resources held by this app instance."""
 
         pygame.quit()
+
+    def _handleRightClick(self) -> None:
+        # Deselect any held piece.
+        if self.selectedSquare:
+            self.selectedSquare = None
+            self.selectedPiece = None
 
     def _handleClick(self) -> None:
         mousePos = pygame.mouse.get_pos()
