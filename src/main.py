@@ -136,13 +136,13 @@ class App:
 
     def _pointOfChessSquare(self, square: chess.Square) -> tuple[float, float]:
         file, rank = chess.square_file(square), chess.square_rank(square)
-        return (self.screen.width // 2 + (file - 4) * SQUARE_SIZE,
-                self.screen.height // 2 + ((7 - rank) - 4) * SQUARE_SIZE)
+        return (self.screen.width / 2 + (file - 4) * SQUARE_SIZE,
+                self.screen.height / 2 + ((7 - rank) - 4) * SQUARE_SIZE)
 
     def _pointOfRowCol(self, rowCol: tuple[int, int]) -> tuple[float, float]:
         row, col = rowCol
-        return (self.screen.width // 2 + (col - 4) * SQUARE_SIZE,
-                self.screen.height // 2 + (row - 4) * SQUARE_SIZE)
+        return (self.screen.width / 2 + (col - 4) * SQUARE_SIZE,
+                self.screen.height / 2 + (row - 4) * SQUARE_SIZE)
 
     def _squareOfPoint(self, xY: tuple[float, float]) -> tuple[int, int] | None:
         x, y = xY
