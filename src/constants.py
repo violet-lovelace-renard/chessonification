@@ -5,6 +5,7 @@ COLOR_LIGHT_SQUARE = pygame.Color.from_hex("#debfff")
 COLOR_LIGHT_SQUARE_TRANSPARENT = pygame.Color.from_hex("#debfff80")
 COLOR_DARK_SQUARE = pygame.Color.from_hex("#8128e0")
 COLOR_DARK_SQUARE_TRANSPARENT = pygame.Color.from_hex("#8128e080")
+COLOR_TURN_INDICATOR = pygame.Color.from_hex("#ae63ff")
 COLOR_CURSOR_BODY = pygame.Color.from_hex("#eeeeee")
 COLOR_CURSOR_OUTLINE = pygame.Color.from_hex("#111111")
 COLOR_NONE = pygame.Color.from_hex("#00000000")
@@ -38,6 +39,14 @@ xPoints = [[d, 0], [s/2, s/2-d], [s-d, 0],
 xPoints = [(x + EXIT_BUTTON_PADDING, y + EXIT_BUTTON_PADDING)
                 for [x, y] in xPoints]
 pygame.draw.polygon(SURFACE_EXIT_BUTTON, COLOR_LIGHT_SQUARE, xPoints)
+
+TURN_INDICATOR_SIZE = 30
+TURN_INDICATOR_MARGIN = 30
+SURFACE_TURN_INDICATOR = pygame.Surface((TURN_INDICATOR_SIZE, TURN_INDICATOR_SIZE), flags=pygame.SRCALPHA)
+SURFACE_TURN_INDICATOR.fill(COLOR_NONE)
+pygame.draw.circle(SURFACE_TURN_INDICATOR, COLOR_TURN_INDICATOR,
+                   [TURN_INDICATOR_SIZE / 2, TURN_INDICATOR_SIZE / 2],
+                   TURN_INDICATOR_SIZE / 2)
 
 DICT_PIECES = {
     "k": pygame.image.load_sized_svg("assets/bK.svg", (SQUARE_SIZE, SQUARE_SIZE)),
