@@ -13,6 +13,7 @@ COLOR_DARK_SQUARE = pygame.Color.from_hex("#8128e0")
 COLOR_DARK_SQUARE_TRANSPARENT = pygame.Color.from_hex("#8128e080")
 COLOR_BOARD_OVERLAY_TRANSPARENT = pygame.Color.from_hex("#4A4A4B80")
 COLOR_TURN_INDICATOR = pygame.Color.from_hex("#ae63ff")
+COLOR_PROMOTE_MENU = pygame.Color.from_hex("#260c42")
 COLOR_TEXT = pygame.Color.from_hex("#ffffff")
 COLOR_NONE = pygame.Color.from_hex("#00000000")
 
@@ -66,6 +67,9 @@ pygame.draw.circle(SURFACE_TURN_INDICATOR, COLOR_TURN_INDICATOR,
 
 SURFACE_BOARD_OVERLAY = _squareMaker(SQUARE_SIZE * 8, True)
 SURFACE_BOARD_OVERLAY.fill(COLOR_BOARD_OVERLAY_TRANSPARENT)
+
+SURFACE_PROMOTE_MENU = pygame.Surface((SQUARE_SIZE * 4.5, SQUARE_SIZE * 1.5))
+SURFACE_PROMOTE_MENU.fill(COLOR_PROMOTE_MENU)
 
 DICT_PIECES = {
     "k": pygame.image.load_sized_svg("assets/bK.svg", (SQUARE_SIZE, SQUARE_SIZE)),

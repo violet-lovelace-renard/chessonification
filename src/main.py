@@ -28,6 +28,7 @@ class App:
         self.hoveredSquare: tuple[int, int] | None = None
         self.selectedSquare: tuple[int, int] | None = None
         self.selectedPiece: chess.Piece | None = None
+        self.promoteMenu: tuple[chess.Color, tuple[int, int]] | None = None
 
     def mainloop(self) -> App:
         """
@@ -74,6 +75,7 @@ class App:
 
         self._drawSelectedPiece()
         self._drawTargetPiece()
+        self._drawPromoteMenu()
         self._drawOverlay()
         self._drawTurnIndicator()
 
@@ -85,10 +87,10 @@ class App:
         pygame.quit()
 
     def _handleRightClick(self) -> None:
-        # Deselect any held piece.
-        if self.selectedSquare:
-            self.selectedSquare = None
-            self.selectedPiece = None
+        # Deselect any held piece and cancel promotion.
+        self.selectedSquare = None
+        self.selectedPiece = None
+        self.promoteMenu = None
 
     def _handleClick(self) -> None:
         mousePos = pygame.mouse.get_pos()
@@ -101,6 +103,29 @@ class App:
             return
 
         if self.board.is_game_over():
+            return
+
+        if self.promoteMenu:
+            choice = self._hoverPromotion()
+
+            if choice is None:
+                self.selectedSquare = None
+                self.selectedPiece = None
+                self.promoteMenu = None
+                return
+
+            _, square = self.promoteMenu
+            choices = [chess.QUEEN, chess.ROOK, chess.BISHOP, chess.KNIGHT]
+
+            assert(self.selectedSquare)
+            tryMovePromote = chess.Move(from_square=self._chessSquareOfPoint(self.selectedSquare),
+                                        to_square=self._chessSquareOfPoint(square),
+                                        promotion=choices[choice])
+            self.board.push(tryMovePromote)
+
+            self.selectedSquare = None
+            self.selectedPiece = None
+            self.promoteMenu = None
             return
 
         if not self.selectedSquare:
@@ -121,18 +146,24 @@ class App:
                 self.selectedPiece = None
                 return
 
-            # TODO: account for promotion
             tryMove = chess.Move(from_square=self._chessSquareOfPoint(self.selectedSquare),
                                  to_square=self._chessSquareOfPoint(square))
+            tryMovePromote = chess.Move(from_square=self._chessSquareOfPoint(self.selectedSquare),
+                                        to_square=self._chessSquareOfPoint(square),
+                                        promotion=chess.QUEEN)
             if self.board.is_legal(tryMove):
                 self.board.push(tryMove)
+            # Easiest way to check if a promoting move is legal, since normal
+            # movement of pawn to 8th rank is illegal.
+            elif self.board.is_legal(tryMovePromote):
+                self.promoteMenu = self.board.turn, square
+                return
 
             self.selectedSquare = None
             self.selectedPiece = None
 
     def _getPieceAt(self, rowCol: tuple[int, int]) -> chess.Piece | None:
         return self.board.piece_at(chess.square(rowCol[1], 7 - rowCol[0]))
-
 
     def _chessSquareOfPoint(self, rowCol: tuple[int, int]) -> chess.Square:
         r, c = rowCol
@@ -153,6 +184,17 @@ class App:
         r, c = (int((y - self.screen.height // 2) // SQUARE_SIZE + 4),
                   int((x - self.screen.width // 2) // SQUARE_SIZE + 4))
         return None if r < 0 or r >= 8 or c < 0 or c >= 8 else (r, c)
+
+    def _hoverPromotion(self) -> int | None:
+        x, y = pygame.mouse.get_pos()
+        if y < self.screen.height / 2 - SQUARE_SIZE / 2 or\
+                y > self.screen.height / 2 + SQUARE_SIZE / 2:
+            return None
+        if x < self.screen.width / 2 - SQUARE_SIZE * 2 or\
+                x > self.screen.width / 2 + SQUARE_SIZE * 2:
+            return None
+
+        return (x - self.screen.width // 2) // SQUARE_SIZE + 2
 
     def _drawSquare(self, rowCol: tuple[int, int], transparent: bool=False) -> None:
         row, col = rowCol
@@ -182,8 +224,25 @@ class App:
         if not self.selectedPiece:
             return
 
+        if self.promoteMenu:
+            return
+
         x, y = pygame.mouse.get_pos()
         self._drawPiece(self.selectedPiece.symbol(), (x, y))
+
+    def _drawPromoteMenu(self) -> None:
+        if not self.promoteMenu:
+            return
+
+        posX = self.screen.width / 2 - SURFACE_PROMOTE_MENU.width / 2
+        posY = self.screen.height / 2 - SURFACE_PROMOTE_MENU.height / 2
+        self.screen.blit(SURFACE_PROMOTE_MENU, (posX, posY))
+
+        pieces = ["Q", "R", "B", "N"]\
+                if self.promoteMenu[0] == chess.WHITE else ["q", "r", "b", "n"]
+        [self.screen.blit(DICT_PIECES[p],
+                          (posX + SQUARE_SIZE * (0.25 + i),
+                           posY + SQUARE_SIZE * 0.25)) for (i, p) in enumerate(pieces)]
 
     def _drawTurnIndicator(self) -> None:
         if self.board.is_game_over():
@@ -232,6 +291,13 @@ class App:
                 mousePos[1] > EXIT_BUTTON_POSITION[1] and\
                 mousePos[1] < EXIT_BUTTON_POSITION[1] + EXIT_BUTTON_SIZE:
             setHand()
+            return
+
+        if self.promoteMenu:
+            if self._hoverPromotion() is None:
+                setArrow()
+            else:
+                setHand()
             return
 
         if self.board.is_game_over():
