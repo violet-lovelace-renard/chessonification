@@ -88,3 +88,7 @@ DICT_PIECES = {
     "N": pygame.image.load_sized_svg("assets/wN.svg", (SQUARE_SIZE, SQUARE_SIZE)),
     "P": pygame.image.load_sized_svg("assets/wP.svg", (SQUARE_SIZE, SQUARE_SIZE)),
 }
+
+FPS = 60
+BPM = 90  # = quarter note
+FRAMES_OF_QUARTER = int(1/BPM * 60 * FPS)

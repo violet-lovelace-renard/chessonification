@@ -42,7 +42,7 @@ class App:
             self.render()
     
             pygame.display.flip()
-            self.clock.tick(60)
+            self.clock.tick(FPS)
 
         return self
 
