@@ -74,6 +74,7 @@ class App:
 
         self._drawSelectedPiece()
         self._drawTargetPiece()
+        self._drawOverlay()
         self._drawTurnIndicator()
 
         self._setCursor()
@@ -97,6 +98,9 @@ class App:
                 mousePos[1] > EXIT_BUTTON_POSITION[1] and\
                 mousePos[1] < EXIT_BUTTON_POSITION[1] + EXIT_BUTTON_SIZE:
             self.running = False
+            return
+
+        if self.board.is_game_over():
             return
 
         if not self.selectedSquare:
@@ -182,13 +186,38 @@ class App:
         self._drawPiece(self.selectedPiece.symbol(), (x, y))
 
     def _drawTurnIndicator(self) -> None:
+        if self.board.is_game_over():
+            posX = self.screen.width / 2
+            posY = self.screen.height / 2 - RESULT_HEIGHT / 2
+
+            match self.board.result():
+                case "1-0":
+                    posX -= TEXT_WHITE_WINS.width / 2
+                    self.screen.blit(TEXT_WHITE_WINS, (posX, posY))
+                case "0-1":
+                    posX -= TEXT_BLACK_WINS.width / 2
+                    self.screen.blit(TEXT_BLACK_WINS, (posX, posY))
+                case _:
+                    posX -= TEXT_DRAW.width / 2
+                    self.screen.blit(TEXT_DRAW, (posX, posY))
+            return
+
         posX = self.screen.width / 2 + 4 * SQUARE_SIZE + TURN_INDICATOR_MARGIN
+        posY = self.screen.height / 2 - TURN_INDICATOR_SIZE / 2
         if self.board.turn == chess.WHITE:
-            posY = self.screen.height / 2 + SQUARE_SIZE / 2 - TURN_INDICATOR_SIZE / 2
+            posY += SQUARE_SIZE / 2
         else:
-            posY = self.screen.height / 2 - SQUARE_SIZE / 2 - TURN_INDICATOR_SIZE / 2
+            posY -= SQUARE_SIZE / 2
 
         self.screen.blit(SURFACE_TURN_INDICATOR, [posX, posY])
+
+    def _drawOverlay(self) -> None:
+        if not self.board.is_game_over():
+            return
+
+        self.screen.blit(SURFACE_BOARD_OVERLAY,
+                        [self.screen.width / 2 - 4 * SQUARE_SIZE,
+                        self.screen.height / 2 - 4 * SQUARE_SIZE])
 
     def _setCursor(self) -> None:
         def setHand() -> None:
@@ -197,20 +226,24 @@ class App:
         def setArrow() -> None:
             pygame.mouse.set_cursor(pygame.Cursor(pygame.SYSTEM_CURSOR_ARROW))
 
+        mousePos = pygame.mouse.get_pos()
+        if mousePos[0] > EXIT_BUTTON_POSITION[0] and\
+                mousePos[0] < EXIT_BUTTON_POSITION[0] + EXIT_BUTTON_SIZE and\
+                mousePos[1] > EXIT_BUTTON_POSITION[1] and\
+                mousePos[1] < EXIT_BUTTON_POSITION[1] + EXIT_BUTTON_SIZE:
+            setHand()
+            return
+
+        if self.board.is_game_over():
+            setArrow()
+            return
+        
         if self.selectedPiece and self.hoveredSquare:
             setHand()
             return
 
         if not self.selectedPiece and self.hoveredSquare\
                 and self._getPieceAt(self.hoveredSquare):
-            setHand()
-            return
-
-        mousePos = pygame.mouse.get_pos()
-        if mousePos[0] > EXIT_BUTTON_POSITION[0] and\
-                mousePos[0] < EXIT_BUTTON_POSITION[0] + EXIT_BUTTON_SIZE and\
-                mousePos[1] > EXIT_BUTTON_POSITION[1] and\
-                mousePos[1] < EXIT_BUTTON_POSITION[1] + EXIT_BUTTON_SIZE:
             setHand()
             return
 

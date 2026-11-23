@@ -1,5 +1,7 @@
 import pygame
 
+pygame.font.init()
+
 def _squareMaker(size: float, transparent: bool=False) -> pygame.Surface:
     return pygame.Surface((size, size),
                           flags=pygame.SRCALPHA if transparent else 0)
@@ -9,11 +11,20 @@ COLOR_LIGHT_SQUARE = pygame.Color.from_hex("#debfff")
 COLOR_LIGHT_SQUARE_TRANSPARENT = pygame.Color.from_hex("#debfff80")
 COLOR_DARK_SQUARE = pygame.Color.from_hex("#8128e0")
 COLOR_DARK_SQUARE_TRANSPARENT = pygame.Color.from_hex("#8128e080")
-COLOR_BOARD_OVERLAY_TRANSPARENT = pygame.Color.from_hex("#7c6b8f80")
+COLOR_BOARD_OVERLAY_TRANSPARENT = pygame.Color.from_hex("#4A4A4B80")
 COLOR_TURN_INDICATOR = pygame.Color.from_hex("#ae63ff")
-COLOR_CURSOR_BODY = pygame.Color.from_hex("#eeeeee")
-COLOR_CURSOR_OUTLINE = pygame.Color.from_hex("#111111")
+COLOR_TEXT = pygame.Color.from_hex("#ffffff")
 COLOR_NONE = pygame.Color.from_hex("#00000000")
+
+FONT_BODY = pygame.Font(size=100)
+
+TEXT_WHITE_WINS = FONT_BODY.render("White wins!", antialias=True,
+                                   color=COLOR_TEXT)
+TEXT_BLACK_WINS = FONT_BODY.render("Black wins!", antialias=True,
+                                   color=COLOR_TEXT)
+TEXT_DRAW = FONT_BODY.render("Draw...", antialias=True,
+                             color=COLOR_TEXT)
+RESULT_HEIGHT = TEXT_WHITE_WINS.height
 
 SQUARE_SIZE = 96
 
@@ -52,6 +63,9 @@ SURFACE_TURN_INDICATOR.fill(COLOR_NONE)
 pygame.draw.circle(SURFACE_TURN_INDICATOR, COLOR_TURN_INDICATOR,
                    [TURN_INDICATOR_SIZE / 2, TURN_INDICATOR_SIZE / 2],
                    TURN_INDICATOR_SIZE / 2)
+
+SURFACE_BOARD_OVERLAY = _squareMaker(SQUARE_SIZE * 8, True)
+SURFACE_BOARD_OVERLAY.fill(COLOR_BOARD_OVERLAY_TRANSPARENT)
 
 DICT_PIECES = {
     "k": pygame.image.load_sized_svg("assets/bK.svg", (SQUARE_SIZE, SQUARE_SIZE)),
