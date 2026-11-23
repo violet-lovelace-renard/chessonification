@@ -30,6 +30,8 @@ class App:
         self.selectedPiece: chess.Piece | None = None
         self.promoteMenu: tuple[chess.Color, tuple[int, int]] | None = None
 
+        self.sonifier: Sonifier = Sonifier()
+
     def mainloop(self) -> App:
         """
         Run the app. Blocks until the app is quit (e.g., by clicking the "X"
@@ -40,6 +42,7 @@ class App:
         while self.running:
             self.update()
             self.render()
+            self.sonifier.tick()
     
             pygame.display.flip()
             self.clock.tick(FPS)
