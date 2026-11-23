@@ -191,11 +191,30 @@ class App:
         self.screen.blit(SURFACE_TURN_INDICATOR, [posX, posY])
 
     def _setCursor(self) -> None:
-        if not self.selectedPiece and\
-            not (self.hoveredSquare and self._getPieceAt(self.hoveredSquare)):
-            pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_ARROW))
-        else:
-            pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_HAND))
+        def setHand() -> None:
+            pygame.mouse.set_cursor(pygame.Cursor(pygame.SYSTEM_CURSOR_HAND))
+
+        def setArrow() -> None:
+            pygame.mouse.set_cursor(pygame.Cursor(pygame.SYSTEM_CURSOR_ARROW))
+
+        if self.selectedPiece and self.hoveredSquare:
+            setHand()
+            return
+
+        if not self.selectedPiece and self.hoveredSquare\
+                and self._getPieceAt(self.hoveredSquare):
+            setHand()
+            return
+
+        mousePos = pygame.mouse.get_pos()
+        if mousePos[0] > EXIT_BUTTON_POSITION[0] and\
+                mousePos[0] < EXIT_BUTTON_POSITION[0] + EXIT_BUTTON_SIZE and\
+                mousePos[1] > EXIT_BUTTON_POSITION[1] and\
+                mousePos[1] < EXIT_BUTTON_POSITION[1] + EXIT_BUTTON_SIZE:
+            setHand()
+            return
+
+        setArrow()
 
 
 def main() -> None:
