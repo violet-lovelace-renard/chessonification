@@ -5,6 +5,7 @@ Usage:
     from sonify import Sonifier
 """
 
+import music21 as m21
 import pygame
 from pygame import midi
 
