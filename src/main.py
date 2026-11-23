@@ -234,9 +234,12 @@ class App:
         if not self.promoteMenu:
             return
 
-        posX = self.screen.width / 2 - SURFACE_PROMOTE_MENU.width / 2
-        posY = self.screen.height / 2 - SURFACE_PROMOTE_MENU.height / 2
-        self.screen.blit(SURFACE_PROMOTE_MENU, (posX, posY))
+        posX = self.screen.width / 2 - SURFACE_PROMOTE_MENU_WHITE.width / 2
+        posY = self.screen.height / 2 - SURFACE_PROMOTE_MENU_WHITE.height / 2
+        self.screen.blit(SURFACE_PROMOTE_MENU_WHITE
+                         if self.board.turn == chess.WHITE
+                         else SURFACE_PROMOTE_MENU_BLACK,
+                         (posX, posY))
 
         pieces = ["Q", "R", "B", "N"]\
                 if self.promoteMenu[0] == chess.WHITE else ["q", "r", "b", "n"]
