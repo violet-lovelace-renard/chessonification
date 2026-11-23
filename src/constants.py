@@ -74,13 +74,14 @@ SURFACE_PROMOTE_MENU_WHITE.fill(COLOR_PROMOTE_MENU_WHITE)
 SURFACE_PROMOTE_MENU_BLACK = pygame.Surface((SQUARE_SIZE * 4.5, SQUARE_SIZE * 1.5))
 SURFACE_PROMOTE_MENU_BLACK.fill(COLOR_PROMOTE_MENU_BLACK)
 
-DICT_PIECES = {
+DICT_PIECES: dict[str, pygame.Surface] = {
     "k": pygame.image.load_sized_svg("assets/bK.svg", (SQUARE_SIZE, SQUARE_SIZE)),
     "q": pygame.image.load_sized_svg("assets/bQ.svg", (SQUARE_SIZE, SQUARE_SIZE)),
     "r": pygame.image.load_sized_svg("assets/bR.svg", (SQUARE_SIZE, SQUARE_SIZE)),
     "b": pygame.image.load_sized_svg("assets/bB.svg", (SQUARE_SIZE, SQUARE_SIZE)),
     "n": pygame.image.load_sized_svg("assets/bN.svg", (SQUARE_SIZE, SQUARE_SIZE)),
     "p": pygame.image.load_sized_svg("assets/bP.svg", (SQUARE_SIZE, SQUARE_SIZE)),
+
     "K": pygame.image.load_sized_svg("assets/wK.svg", (SQUARE_SIZE, SQUARE_SIZE)),
     "Q": pygame.image.load_sized_svg("assets/wQ.svg", (SQUARE_SIZE, SQUARE_SIZE)),
     "R": pygame.image.load_sized_svg("assets/wR.svg", (SQUARE_SIZE, SQUARE_SIZE)),
@@ -92,3 +93,36 @@ DICT_PIECES = {
 FPS = 60
 BPM = 90  # = quarter note
 FRAMES_OF_QUARTER = int(1/BPM * 60 * FPS)
+
+# White is more orchestral/acoustic, Black is more synth/electric
+DICT_INSTRUMENTS: dict[str, int] = {
+    "k": 0,   # No actual instrument
+    "q": 86,  # Synth lead (voice)
+    "r": 40,  # Synth bass 2 (Yamaha DX7)
+    "b": 92,  # Synth pad 4 (choir)
+    "n": 82,  # Synth lead 2 (sawtooth)
+    "p": 0,   # No actual instrument (drum channel)
+
+    "K": 0,   # No actual instrument
+    "Q": 57,  # Trumpet
+    "R": 33,  # Acoustic bass
+    "B": 47,  # Orchestral harp
+    "N": 41,  # Violin
+    "P": 0,   # No actual instrument (drum channel)
+}
+
+DICT_CHANNELS: dict[str, int] = {
+    "k": 0,
+    "q": 0,
+    "r": 1,
+    "b": 2,
+    "n": 3,
+    "p": 9,  # Drum channel
+
+    "K": 0,
+    "Q": 4,
+    "R": 5,
+    "B": 6,
+    "N": 7,
+    "P": 9,  # Drum channel
+}
