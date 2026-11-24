@@ -5,6 +5,8 @@ Usage:
     python main.py
 """
 
+from __future__ import annotations
+
 import chess
 import pygame
 
@@ -42,7 +44,7 @@ class App:
         while self.running:
             self.update()
             self.render()
-            self.sonifier.tick()
+            self.sonifier.tick(self.board)
     
             pygame.display.flip()
             self.clock.tick(FPS)
@@ -155,9 +157,13 @@ class App:
                                         to_square=self._chessSquareOfPoint(square),
                                         promotion=chess.QUEEN)
             if self.board.is_legal(tryMove):
+                moving_piece = self.board.piece_at(tryMove.from_square)
                 self.board.push(tryMove)
             # Easiest way to check if a promoting move is legal, since normal
             # movement of pawn to 8th rank is illegal.
+                if (moving_piece and moving_piece.color == chess.WHITE
+                        and moving_piece.piece_type == chess.KNIGHT):
+                    self.sonifier.move_knight(tryMove, self.board)
             elif self.board.is_legal(tryMovePromote):
                 self.promoteMenu = self.board.turn, square
                 return

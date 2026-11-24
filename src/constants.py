@@ -93,6 +93,17 @@ DICT_PIECES: dict[str, pygame.Surface] = {
 FPS = 60
 BPM = 90  # = quarter note
 FRAMES_OF_QUARTER = int(1/BPM * 60 * FPS)
+FRAMES_OF_EIGHTH = FRAMES_OF_QUARTER // 2
+
+# MIDI drum pitches for white pawn ranks, from the player's starting side.
+DICT_PAWN_DRUMS: dict[int, int] = {
+    2: 42,  # Closed hi-hat
+    3: 37,  # Side stick
+    4: 38,  # Snare
+    5: 36,  # Kick
+    6: 45,  # Low tom
+    7: 46,  # Open hi-hat
+}
 
 # White is more orchestral/acoustic, Black is more synth/electric
 DICT_INSTRUMENTS: dict[str, int] = {
@@ -107,7 +118,7 @@ DICT_INSTRUMENTS: dict[str, int] = {
     "Q": 57,  # Trumpet
     "R": 33,  # Acoustic bass
     "B": 47,  # Orchestral harp
-    "N": 41,  # Violin
+    "N": 40,  # Violin (MIDI instrument numbers start at 0)
     "P": 0,   # No actual instrument (drum channel)
 }
 
