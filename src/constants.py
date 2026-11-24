@@ -92,7 +92,11 @@ DICT_PIECES: dict[str, pygame.Surface] = {
 
 FPS = 60
 BPM = 90  # = quarter note
-FRAMES_OF_QUARTER = int(1/BPM * 60 * FPS)
+FRAMES_OF_16TH = int(1/BPM * 60 * FPS / 4)
+
+PIECES = 12
+LIST_PIECES = ["k", "q", "r", "b", "n", "p",
+               "K", "Q", "R", "B", "N", "P"]
 
 # White is more orchestral/acoustic, Black is more synth/electric
 DICT_INSTRUMENTS: dict[str, int] = {

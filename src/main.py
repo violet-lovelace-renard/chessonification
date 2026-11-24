@@ -30,7 +30,7 @@ class App:
         self.selectedPiece: chess.Piece | None = None
         self.promoteMenu: tuple[chess.Color, tuple[int, int]] | None = None
 
-        self.sonifier: Sonifier = Sonifier()
+        self.sonifier: Sonifier = Sonifier(self.board)
 
     def mainloop(self) -> App:
         """
