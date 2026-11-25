@@ -20,12 +20,15 @@ class Sonifier:
         midi.init()
 
         self.ticks = 0
-        self.player = midi.Output(0)  # Device id 0 = the computer
         self.board = board
-        self.measure, self.measureEvents = self._generateMeasure()
 
+        self.player = midi.Output(0)  # Device id 0 = the computer
         for p in LIST_PIECES:
             self.player.set_instrument(DICT_INSTRUMENTS[p], DICT_CHANNELS[p])
+
+        self.measure: Sonifier.Measure
+        self.measureEvents: list[list[Sonifier.Event]]
+        self._generateMeasure()
 
     def tick(self) -> None:
         # Determine which note in the measure to play
@@ -49,13 +52,14 @@ class Sonifier:
                 self.player.note_off(event.pitch, 127, channel)
 
             self.ticks = 0
-            self.measure, self.measureEvents = self._generateMeasure()
+            self._generateMeasure()
 
-    def _generateMeasure(self) -> tuple[Measure, list[list[Sonifier.Event]]]:
-        m = self.Measure()
+    def _generateMeasure(self) -> None:
+        self.measure = self.Measure()
         for i in range(8):
-            m.addNote(5, self.Note(42, i * 2, 1))
-        return m, m.asEvents()
+            self.measure.addNote(5, self.Note(42, i * 2, 1))
+
+        self.measureEvents = self.measure.asEvents()
 
     class Note:
         """Always exists in the context of a particular instrument."""
